@@ -1,0 +1,7 @@
+POST http://localhost:8080/agendamentos
+Content-Type: application/json
+
+{
+  "cliente": "Guilherme Rodrigues",
+  "dataHoraAgendamento": "2026-06-15T14:30:00"
+}

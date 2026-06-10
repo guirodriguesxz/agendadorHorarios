@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-agendador
+    ports:
+      - "5672:5672"   # Porta de comunicação com o Spring Boot
+      - "15672:15672" # Porta do painel visual (para vermos as mensagens pelo navegador)
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
