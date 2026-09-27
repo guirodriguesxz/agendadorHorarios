@@ -1,7 +1,9 @@
 package com.guilhermerodrigues.agendador_horarios.controller;
 
+import com.guilhermerodrigues.agendador_horarios.controller.dto.AgendamentoRequest;
 import com.guilhermerodrigues.agendador_horarios.infrastructure.entity.Agendamento;
 import com.guilhermerodrigues.agendador_horarios.services.AgendamentoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -21,13 +23,8 @@ public class AgendamentoController {
 
     // Criação de agendamento
     @PostMapping
-    public ResponseEntity<Agendamento> salvarAgendamento(@RequestBody Agendamento agendamento) {
-        try {
-            Agendamento salvo = agendamentoService.salvarAgendamento(agendamento);
-            return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<Agendamento> salvarAgendamento(@RequestBody @Valid AgendamentoRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(agendamentoService.salvarAgendamento(request));
     }
 
     // Deletar agendamento por cliente e data/hora
@@ -35,37 +32,23 @@ public class AgendamentoController {
     public ResponseEntity<Void> deletarAgendamento(
             @RequestParam String cliente,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataHoraAgendamento) {
-        try {
-            agendamentoService.deletarAgendamento(dataHoraAgendamento, cliente);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        agendamentoService.deletarAgendamento(dataHoraAgendamento, cliente);
+        return ResponseEntity.noContent().build();
     }
 
     // Buscar todos os agendamentos de um dia
     @GetMapping
     public ResponseEntity<List<Agendamento>> buscarAgendamentosDia(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
-        try {
-            List<Agendamento> agendamentos = agendamentoService.buscarAgendamentosDia(data);
-            return ResponseEntity.ok(agendamentos);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        return ResponseEntity.ok(agendamentoService.buscarAgendamentosDia(data));
     }
 
     // Alterar agendamento
     @PutMapping
-    public ResponseEntity<Agendamento> alterarAgendamentos(
-            @RequestBody Agendamento agendamento,
+    public ResponseEntity<Agendamento> alterarAgendamento(
+            @RequestBody @Valid AgendamentoRequest request,
             @RequestParam String cliente,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataHoraAgendamento) {
-        try {
-            Agendamento atualizado = agendamentoService.alterarAgendamento(agendamento, cliente, dataHoraAgendamento);
-            return ResponseEntity.ok(atualizado);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        return ResponseEntity.ok(agendamentoService.alterarAgendamento(request, cliente, dataHoraAgendamento));
     }
 }

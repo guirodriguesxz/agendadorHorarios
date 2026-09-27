@@ -1,7 +1,40 @@
+### Criar agendamento
 POST http://localhost:8080/agendamentos
 Content-Type: application/json
 
 {
+  "servico": "Corte + Barba",
+  "profissional": "Carlos",
+  "dataHoraAgendamento": "2030-06-15T14:30:00",
   "cliente": "Guilherme Rodrigues",
-  "dataHoraAgendamento": "2026-06-15T14:30:00"
+  "telefoneCliente": "11999999999"
 }
+
+### Mesmo profissional e horário -> 409 Conflict
+POST http://localhost:8080/agendamentos
+Content-Type: application/json
+
+{
+  "servico": "Corte",
+  "profissional": "Carlos",
+  "dataHoraAgendamento": "2030-06-15T14:30:00",
+  "cliente": "Outro Cliente"
+}
+
+### Agenda do dia
+GET http://localhost:8080/agendamentos?data=2030-06-15
+
+### Remarcar
+PUT http://localhost:8080/agendamentos?cliente=Guilherme Rodrigues&dataHoraAgendamento=2030-06-15T14:30:00
+Content-Type: application/json
+
+{
+  "servico": "Corte + Barba",
+  "profissional": "Carlos",
+  "dataHoraAgendamento": "2030-06-15T16:00:00",
+  "cliente": "Guilherme Rodrigues",
+  "telefoneCliente": "11999999999"
+}
+
+### Cancelar
+DELETE http://localhost:8080/agendamentos?cliente=Guilherme Rodrigues&dataHoraAgendamento=2030-06-15T16:00:00
