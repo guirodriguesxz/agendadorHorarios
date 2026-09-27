@@ -1,12 +1,48 @@
-version: '3.8'
-
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-agendador
+    environment:
+      POSTGRES_DB: agendador
+      POSTGRES_USER: agendador
+      POSTGRES_PASSWORD: agendador
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agendador"]
+      interval: 5s
+      retries: 10
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq-agendador
     ports:
-      - "5672:5672"   # Porta de comunicação com o Spring Boot
-      - "15672:15672" # Porta do painel visual (para vermos as mensagens pelo navegador)
+      - "5672:5672"   # Comunicação com o Spring Boot
+      - "15672:15672" # Painel web para visualizar as filas
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin123
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      retries: 10
+
+  app:
+    build: ./agendador-horarios
+    container_name: agendador-api
+    profiles: ["app"]  # sobe só com: docker compose --profile app up
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/agendador
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  pgdata:
